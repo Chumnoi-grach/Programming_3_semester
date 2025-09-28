@@ -24,13 +24,11 @@ int main(int argc, char* argv[]) {
     
     printf("Client: PID %d, File: %s, Symbol: '%c'\n", client_pid, input_file, symbol);
     
-    // Проверка существования входного файла
     if (access(input_file, F_OK) == -1) {
         fprintf(stderr, "Client %d: Error: Input file %s does not exist\n", client_pid, input_file);
         return FAIL;
     }
     
-    // Создание клиентского FIFO
     char client_fifo_name[MAX_FILENAME];
     snprintf(client_fifo_name, sizeof(client_fifo_name), CLIENT_FIFO_TEMPLATE, client_pid);
     
@@ -39,14 +37,12 @@ int main(int argc, char* argv[]) {
         return FAIL;
     }
     
-    // Подготовка запроса
     request_t request;
     request.client_pid = client_pid;
     strncpy(request.input_file, input_file, MAX_FILENAME - 1);
     request.input_file[MAX_FILENAME - 1] = '\0';
     request.symbol = symbol;
     
-    // Отправка запроса серверу
     int server_fd = open(SERVER_FIFO, O_WRONLY);
     if (server_fd == -1) {
         fprintf(stderr, "Client %d: Error opening server FIFO: %s\n", client_pid, strerror(errno));
@@ -58,7 +54,6 @@ int main(int argc, char* argv[]) {
     write(server_fd, &request, sizeof(request_t));
     close(server_fd);
     
-    // Ожидание ответа от сервера
     int client_fd = open(client_fifo_name, O_RDONLY);
     if (client_fd == -1) {
         fprintf(stderr, "Client %d: Error opening client FIFO for reading: %s\n", client_pid, strerror(errno));
@@ -70,7 +65,6 @@ int main(int argc, char* argv[]) {
     ssize_t bytes_read = read(client_fd, &result, sizeof(int));
     close(client_fd);
     
-    // Очистка клиентского FIFO
     unlink(client_fifo_name);
     
     if (bytes_read == sizeof(int)) {

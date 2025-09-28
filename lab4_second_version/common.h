@@ -16,7 +16,6 @@
 #define SERVER_FIFO "/tmp/lab4_server_fifo"
 #define CLIENT_FIFO_TEMPLATE "/tmp/lab4_client_%d_fifo"
 
-// Структура для передачи запроса от клиента к серверу
 typedef struct {
     pid_t client_pid;
     char input_file[MAX_FILENAME];

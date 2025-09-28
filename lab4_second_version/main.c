@@ -34,7 +34,6 @@ int main(int argc, char* argv[]) {
             fprintf(stderr, "Error forking process for file %s\n", input_file);
             results[i] = FAIL;
         } else if (pid == 0) {
-            // Дочерний процесс - запускаем клиента
             execl("./client", "client", input_file, symbol, NULL);
             fprintf(stderr, "Error executing client for file %s\n", input_file);
             exit(FAIL);
@@ -44,7 +43,6 @@ int main(int argc, char* argv[]) {
         }
     }
     
-    // Ожидание завершения всех клиентских процессов
     for (int i = 0; i < file_count; i++) {
         int status;
         pid_t pid = waitpid(pids[i], &status, 0);
@@ -60,8 +58,7 @@ int main(int argc, char* argv[]) {
             results[i] = FAIL;
         }
     }
-    //                      ?
-    // Вывод итоговых результатов
+    
     printf("\n=== Final Processing Results ===\n");
     int total_replacements = 0;
     int successful_files = 0;

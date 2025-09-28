@@ -163,7 +163,6 @@ void cleanup_fifo() {
 int main() {
     printf("Server: Starting FIFO server...\n");
     
-    // Установка обработчика для очистки FIFO при завершении
     atexit(cleanup_fifo);
     
     
@@ -186,7 +185,6 @@ int main() {
     
     printf("Server: Waiting for client requests...\n");
     
-    // Открытие серверного FIFO для чтения
     server_fd = open(SERVER_FIFO, O_RDONLY);
     if (server_fd == -1) {
         fprintf(stderr, "Server: Error opening server FIFO for reading: %s\n", strerror(errno));
@@ -196,21 +194,17 @@ int main() {
     printf("Server: Ready to receive requests\n");
     
     while (1) {
-        // Чтение запроса от клиента
         ssize_t bytes_read = read(server_fd, &request, sizeof(request_t));
         
         if (bytes_read == sizeof(request_t)) {
             printf("\nServer: Received request from client PID %d\n", request.client_pid);
             printf("Server: File: %s, Symbol: '%c'\n", request.input_file, request.symbol);
             
-            // Обработка файла
             result = process_file_server(request.input_file, request.symbol);
             
-            // Формирование имени клиентского FIFO
             char client_fifo_name[MAX_FILENAME];
             snprintf(client_fifo_name, sizeof(client_fifo_name), CLIENT_FIFO_TEMPLATE, request.client_pid);
             
-            // Отправка ответа клиенту
             client_fd = open(client_fifo_name, O_WRONLY);
             if (client_fd != -1) {
                 write(client_fd, &result, sizeof(int));
@@ -220,7 +214,6 @@ int main() {
                 fprintf(stderr, "Server: Error opening client FIFO %s: %s\n", client_fifo_name, strerror(errno));
             }
         } else if (bytes_read == 0) {
-            // Клиент закрыл соединение
             printf("Server: No more requests, shutting down...\n");
             break;
         } else {
