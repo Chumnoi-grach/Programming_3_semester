@@ -15,6 +15,6 @@ make - сборка
 оттельно запускается сервер и отдельно клиент
 сделано при помощи FIFO(повышенная сложность)
 пример запуска:
-./server & ./main 123.txt f 1234 f
+./server & sleep 1 && ./main 123.txt f 1234 f
 
-./server & ./main filename symv ...
+./server & sleep 1 && ./main filename symv ...
